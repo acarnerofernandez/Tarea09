@@ -2,40 +2,56 @@ public class GestorDescargas {
 
     public static void main(String[] args) throws InterruptedException {
 
+        String[] archivos;
 
-        Descarga d1 = new Descarga("cuarzos.png");
-        Descarga d2 = new Descarga("meditacion.mp4");
-        Descarga d3 = new Descarga("mantras.mp3");
-        Descarga d4 = new Descarga("horoscopo.pdf");
+        if (args.length == 0) {
 
+            archivos = new String[]{
+                    "cuarzos.png",
+                    "meditacion.mp4",
+                    "mantras.mp3",
+                    "horoscopo.pdf"
+            };
+        } else {
 
-        d1.setName("Descarga-cuarzos.png");
-        d2.setName("Descarga-meditacion.mp4");
-        d3.setName("Descarga-mantras.mp3");
-        d4.setName("Descarga-horoscopo.pdf");
+            archivos = args;
+        }
 
+        Descarga[] descargas = new Descarga[archivos.length];
+
+        for (int i = 0; i < archivos.length; i++) {
+            descargas[i] = new Descarga(archivos[i]);
+            descargas[i].setName("Descarga-" + archivos[i]);
+        }
+
+        Monitor monitorRunnable = new Monitor(descargas);
+        Thread hiloMonitor = new Thread(monitorRunnable);
 
         long inicioPrograma = System.currentTimeMillis();
 
+        for (Descarga d : descargas){
 
-        d1.start();
-        d2.start();
-        d3.start();
-        d4.start();
+            d.start();
 
+        }
 
-        d1.join();
-        d2.join();
-        d3.join();
-        d4.join();
+        hiloMonitor.start();
 
+        for (Descarga d : descargas){
+
+            d.join();
+
+        }
 
         long finPrograma = System.currentTimeMillis();
 
-
         long tiempoReal = finPrograma - inicioPrograma;
-        long sumaSecuencial = d1.getTiempoFinal() + d2.getTiempoFinal()  + d3.getTiempoFinal() + d4.getTiempoFinal();
+        long sumaSecuencial = 0;
 
+        for (Descarga d : descargas){
+            sumaSecuencial += d.getTiempoFinal();
+
+        }
 
 
         System.out.println("Todas las descargas han terminado.");
